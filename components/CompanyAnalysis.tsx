@@ -27,7 +27,7 @@ interface AnalysisData {
   competitors: Competitor[]
 }
 
-const InfoItem = ({ icon: Icon, label, value }: { icon: any, label: string, value: string }) => (
+const InfoItem = ({ icon: Icon, label, value }: { icon: any, label: string, value: string | React.ReactNode }) => (
   <div className="flex items-start gap-2">
     <div className="p-1.5 bg-blue-50 rounded-lg">
       <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-500" />

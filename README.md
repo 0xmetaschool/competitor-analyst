@@ -1,1 +1,1 @@
-# competitor-analyst
+# CompetitorAnalyst
