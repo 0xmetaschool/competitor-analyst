@@ -1,17 +1,18 @@
-'use client'
+import { Card, Title, Text, Grid } from '@tremor/react'
+import { BuildingOfficeIcon, GlobeAltIcon, UserGroupIcon, CalendarIcon, SparklesIcon } from '@heroicons/react/24/outline'
 
-import { Card, Title, Text, Grid, Metric } from '@tremor/react'
-import { GlobeAltIcon, UserGroupIcon, CalendarIcon, BuildingOfficeIcon, SparklesIcon } from '@heroicons/react/24/outline'
-
-interface CompanyInfo {
+interface CompanyBasic {
   name: string
-  punchline: string
   website: string
   industry: string
   location: string
   employees: string
   foundingYear: string
   companyType: string
+}
+
+interface CompanyDetails {
+  punchline: string
   tagline: string
   specialties: string[]
 }
@@ -19,88 +20,89 @@ interface CompanyInfo {
 interface Competitor {
   name: string
   description: string
+  industry: string
+  location: string
+  employees: string
+  foundingYear: string
+  companyType: string
   differences: string[]
 }
 
 interface AnalysisData {
-  companyInfo: CompanyInfo
+  companyInfo: CompanyBasic
+  detailsData: {
+    companyDetails: CompanyDetails
+  }
   competitors: Competitor[]
 }
 
-const InfoItem = ({ icon: Icon, label, value }: { icon: any, label: string, value: string | React.ReactNode }) => (
-  <div className="flex items-start gap-2">
-    <div className="p-1.5 bg-blue-50 rounded-lg">
-      <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-500" />
-    </div>
-    <div>
-      <Text className="font-medium text-gray-500 text-sm sm:text-base">{label}</Text>
-      <Text className="text-gray-900 text-sm sm:text-base">{value}</Text>
-    </div>
-  </div>
-)
-
 export default function CompanyAnalysis({ data }: { data: AnalysisData }) {
+  const { companyInfo, detailsData, competitors } = data
+
   return (
-    <div className="space-y-6 sm:space-y-8 animate-fade-in">
-      {/* Company Introduction Block */}
-      <Card className="p-4 sm:p-6 hover:shadow-lg transition-shadow duration-200">
-        <Title className="text-xl sm:text-2xl mb-4 sm:mb-6">Company Introduction</Title>
-        <div className="space-y-4 sm:space-y-6">
-          <div className="border-b pb-4 sm:pb-6">
-            <Text className="text-xl sm:text-2xl font-bold text-blue-900">{data.companyInfo.name}</Text>
-            <Text className="text-base sm:text-lg text-gray-600 mt-2">{data.companyInfo.punchline}</Text>
-          </div>
-
-          <Grid numItems={1} numItemsSm={2} numItemsLg={3} className="gap-4 sm:gap-6">
-            <InfoItem 
-              icon={GlobeAltIcon}
-              label="Website"
-              value={
-                <a href={data.companyInfo.website} target="_blank" rel="noopener noreferrer" 
-                   className="text-blue-600 hover:underline">
-                  {data.companyInfo.website}
-                </a>
-              }
-            />
-            <InfoItem 
-              icon={BuildingOfficeIcon}
-              label="Industry"
-              value={data.companyInfo.industry}
-            />
-            <InfoItem 
-              icon={GlobeAltIcon}
-              label="Location"
-              value={data.companyInfo.location}
-            />
-            <InfoItem 
-              icon={UserGroupIcon}
-              label="Employees"
-              value={data.companyInfo.employees}
-            />
-            <InfoItem 
-              icon={CalendarIcon}
-              label="Founded"
-              value={data.companyInfo.foundingYear}
-            />
-            <InfoItem 
-              icon={BuildingOfficeIcon}
-              label="Company Type"
-              value={data.companyInfo.companyType}
-            />
-          </Grid>
-
-          <div className="pt-4 border-t">
-            <Text className="font-semibold mb-2 text-sm sm:text-base">Tagline</Text>
-            <Text className="text-base sm:text-lg italic text-gray-600">"{data.companyInfo.tagline}"</Text>
-          </div>
-
+    <div className="space-y-8 sm:space-y-12">
+      {/* Company Overview */}
+      <Card className="p-6 sm:p-8 hover:shadow-xl transition-all duration-300 bg-white/90 backdrop-blur-lg border border-gray-100">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8">
           <div>
-            <Text className="font-semibold mb-2 text-sm sm:text-base">Specialties</Text>
+            <Title className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{companyInfo.name}</Title>
+            <Text className="text-gray-600">{detailsData.companyDetails.tagline}</Text>
+          </div>
+          <a
+            href={`https://${companyInfo.website}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 sm:mt-0 inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            <GlobeAltIcon className="h-5 w-5" />
+            <span>{companyInfo.website}</span>
+          </a>
+        </div>
+
+        <Grid numItems={1} numItemsSm={2} numItemsLg={3} className="gap-6">
+          <InfoCard
+            icon={BuildingOfficeIcon}
+            label="Industry"
+            value={companyInfo.industry}
+          />
+          <InfoCard
+            icon={GlobeAltIcon}
+            label="Location"
+            value={companyInfo.location}
+          />
+          <InfoCard
+            icon={UserGroupIcon}
+            label="Employees"
+            value={companyInfo.employees}
+          />
+          <InfoCard
+            icon={CalendarIcon}
+            label="Founded"
+            value={companyInfo.foundingYear}
+          />
+          <InfoCard
+            icon={BuildingOfficeIcon}
+            label="Company Type"
+            value={companyInfo.companyType}
+          />
+        </Grid>
+      </Card>
+
+      {/* Company Details */}
+      <Card className="p-6 sm:p-8 hover:shadow-xl transition-all duration-300 bg-white/90 backdrop-blur-lg border border-gray-100">
+        <Title className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Company Details</Title>
+        <div className="space-y-6">
+          <div>
+            <Text className="text-gray-500 mb-2">Punchline</Text>
+            <Text className="text-lg text-gray-900">{detailsData.companyDetails.punchline}</Text>
+          </div>
+          <div>
+            <Text className="text-gray-500 mb-3">Specialties</Text>
             <div className="flex flex-wrap gap-2">
-              {data.companyInfo.specialties.map((specialty, index) => (
-                <span 
-                  key={index} 
-                  className="px-2 py-0.5 sm:px-3 sm:py-1 bg-blue-50 text-blue-700 rounded-full text-xs sm:text-sm font-medium hover:bg-blue-100 transition-colors duration-200"
+              {detailsData.companyDetails.specialties.map((specialty, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors"
                 >
                   {specialty}
                 </span>
@@ -110,34 +112,72 @@ export default function CompanyAnalysis({ data }: { data: AnalysisData }) {
         </div>
       </Card>
 
-      {/* Competitor Analysis Block */}
-      <Card className="p-4 sm:p-6 hover:shadow-lg transition-shadow duration-200">
-        <Title className="text-xl sm:text-2xl mb-4 sm:mb-6">Competitor Analysis</Title>
-        <div className="space-y-6 sm:space-y-8">
-          {data.competitors.map((competitor, index) => (
-            <div key={index} className={`${index !== 0 ? 'border-t pt-6 sm:pt-8' : ''}`}>
-              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <div className="p-1.5 sm:p-2 bg-purple-50 rounded-lg">
-                  <BuildingOfficeIcon className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-purple-500" />
-                </div>
-                <Text className="text-lg sm:text-xl font-semibold text-purple-900">{competitor.name}</Text>
-              </div>
-              <Text className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">{competitor.description}</Text>
-              <div className="bg-purple-50 rounded-lg p-3 sm:p-4">
-                <Text className="font-semibold text-purple-900 mb-2 text-sm sm:text-base">Key Differences</Text>
-                <ul className="space-y-2">
-                  {competitor.differences.map((difference, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <SparklesIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-500 flex-shrink-0 mt-0.5" />
-                      <Text className="text-sm sm:text-base text-gray-700">{difference}</Text>
-                    </li>
-                  ))}
-                </ul>
+      {/* Competitor Analysis */}
+      <div className="space-y-6">
+        <Title className="text-xl sm:text-2xl font-bold text-gray-900 px-2">Competitor Analysis</Title>
+        {competitors.map((competitor, index) => (
+          <Card
+            key={index}
+            className="p-6 sm:p-8 hover:shadow-xl transition-all duration-300 bg-white/90 backdrop-blur-lg border border-gray-100"
+          >
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
+              <div>
+                <Title className="text-xl font-bold text-gray-900 mb-2">{competitor.name}</Title>
+                <Text className="text-gray-600">{competitor.description}</Text>
               </div>
             </div>
-          ))}
+
+            <Grid numItems={1} numItemsSm={2} className="gap-6 mb-6">
+              <InfoCard
+                icon={BuildingOfficeIcon}
+                label="Industry"
+                value={competitor.industry}
+              />
+              <InfoCard
+                icon={GlobeAltIcon}
+                label="Location"
+                value={competitor.location}
+              />
+              <InfoCard
+                icon={UserGroupIcon}
+                label="Employees"
+                value={competitor.employees}
+              />
+              <InfoCard
+                icon={CalendarIcon}
+                label="Founded"
+                value={competitor.foundingYear}
+              />
+            </Grid>
+
+            <div>
+              <Text className="text-gray-500 mb-4">Key Differences</Text>
+              <div className="space-y-3">
+                {competitor.differences.map((difference, idx) => (
+                  <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <SparklesIcon className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <Text className="text-gray-700">{difference}</Text>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function InfoCard({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
+  return (
+    <div className="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+      <div className="flex items-center gap-3 mb-2">
+        <div className="p-2 bg-white rounded-lg">
+          <Icon className="h-5 w-5 text-blue-500" />
         </div>
-      </Card>
+        <Text className="font-medium text-gray-900">{label}</Text>
+      </div>
+      <Text className="text-gray-600 pl-11">{value}</Text>
     </div>
   )
 }
