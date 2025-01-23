@@ -10,6 +10,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [showResults, setShowResults] = useState(false)
   const [analysisData, setAnalysisData] = useState(null)
+  const [loadingStep, setLoadingStep] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -19,6 +20,7 @@ export default function Home() {
 
     try {
       // Step 1: Get basic company info
+      setLoadingStep('Getting company information...')
       const basicResponse = await fetch('/api/company-basic', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -33,6 +35,7 @@ export default function Home() {
       const companyInfo = basicData.companyBasic
 
       // Step 2: Get company details
+      setLoadingStep('Analyzing company details...')
       const detailsResponse = await fetch('/api/company-details', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -46,6 +49,7 @@ export default function Home() {
       const detailsData = await detailsResponse.json()
 
       // Step 3: Get competitor names
+      setLoadingStep('Identifying competitors...')
       const competitorsResponse = await fetch('/api/competitor-names', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -59,6 +63,7 @@ export default function Home() {
       const competitorsData = await competitorsResponse.json()
 
       // Step 4: Get competitor info and differences
+      setLoadingStep('Analyzing competitors...')
       const competitorPromises = competitorsData.competitors.map(async (competitor: { name: string }) => {
         // Get competitor info
         const competitorInfoResponse = await fetch('/api/competitor-info', {
@@ -93,7 +98,13 @@ export default function Home() {
         const differencesData = await differencesResponse.json()
 
         return {
-          ...competitorInfo.competitor,
+          name: competitorInfo.competitor.name,
+          description: competitorInfo.competitor.description,
+          industry: competitorInfo.competitor.industry,
+          location: competitorInfo.competitor.location,
+          employees: competitorInfo.competitor.employees,
+          foundingYear: competitorInfo.competitor.foundingYear,
+          companyType: competitorInfo.competitor.companyType,
           differences: differencesData.differences.differencesList
         }
       })
@@ -101,71 +112,73 @@ export default function Home() {
       const competitors = await Promise.all(competitorPromises)
 
       // Show the analysis component with all the data
-      setAnalysisData({ companyInfo, detailsData, competitors })
+      setAnalysisData({
+        company: {
+          ...companyInfo,
+          ...detailsData.companyDetails
+        },
+        competitors
+      })
       setShowResults(true)
-
     } catch (err) {
-      console.error('Error:', err)
-      setError(err instanceof Error ? err.message : 'Failed to complete analysis')
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred')
     } finally {
       setIsLoading(false)
+      setLoadingStep(null)
     }
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        <div className="text-center mb-12 sm:mb-16">
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
-            Competitor Analysis Tool
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
-            Enter a company's domain to get detailed insights about their competitors
-          </p>
-        </div>
+    <main className="container fade-in">
+      <div className="flex flex-col items-center justify-center min-h-screen py-12">
+        <h1 className="text-4xl font-bold mb-8 text-center">
+          Competitor Analysis Tool
+        </h1>
         
-        <div className="max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 backdrop-blur-lg bg-opacity-90">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    value={domain}
-                    onChange={(e) => setDomain(e.target.value)}
-                    placeholder="Enter company domain (e.g., apple.com)"
-                    className="block w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl bg-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base placeholder-gray-400 transition-all duration-200"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isLoading || !domain}
-                  className="w-full sm:w-auto px-8 py-3.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:hover:shadow-lg flex items-center justify-center gap-2"
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                      <span>Analyzing...</span>
-                    </>
-                  ) : (
-                    'Analyze Company'
-                  )}
-                </button>
-              </div>
-              {error && (
-                <div className="mt-4 p-4 bg-red-50 rounded-xl text-red-600 text-center">
-                  {error}
-                </div>
-              )}
-            </form>
+        <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
+          <div className="input-container flex items-center">
+            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 mr-2" />
+            <input
+              type="text"
+              value={domain}
+              onChange={(e) => setDomain(e.target.value)}
+              placeholder="Enter company domain..."
+              className="flex-1"
+              disabled={isLoading}
+            />
           </div>
-        </div>
+          
+          <button
+            type="submit"
+            disabled={isLoading || !domain}
+            className="w-full flex items-center justify-center"
+          >
+            {isLoading ? (
+              <>
+                <div className="loading-spinner mr-2" />
+                Analyzing...
+              </>
+            ) : (
+              'Analyze Competitors'
+            )}
+          </button>
+        </form>
+
+        {loadingStep && (
+          <div className="loading-message mt-4">
+            <div className="loading-spinner" />
+            {loadingStep}
+          </div>
+        )}
+
+        {error && (
+          <div className="text-red-500 mt-4">
+            {error}
+          </div>
+        )}
 
         {showResults && analysisData && (
-          <div className="animate-fade-in">
+          <div className="w-full max-w-4xl mt-8">
             <CompanyAnalysis data={analysisData} />
           </div>
         )}
