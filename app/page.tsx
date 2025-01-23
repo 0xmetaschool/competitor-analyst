@@ -156,20 +156,13 @@ export default function Home() {
             {isLoading ? (
               <>
                 <div className="loading-spinner mr-2" />
-                Analyzing...
+                {loadingStep}
               </>
             ) : (
               'Analyze Competitors'
             )}
           </button>
         </form>
-
-        {loadingStep && (
-          <div className="loading-message mt-4">
-            <div className="loading-spinner" />
-            {loadingStep}
-          </div>
-        )}
 
         {error && (
           <div className="text-red-500 mt-4">

@@ -3,21 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-  --primary-color: #6366f1;
-  --background-dark: #111827;
-  --text-light: #f3f4f6;
-  --card-dark: #1f2937;
-  --border-dark: #374151;
+  --primary-color: #DDBEA9;
+  --background-light: #F0E3D3;
+  --text-dark: #333;
+  --text-light: #000;
+  --card-light: #fff;
+  --border-light: #ccc;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-start-rgb));
-  background-color: var(--background-dark);
-  color: var(--text-light);
+  background-color: var(--background-light);
+  color: var(--text-dark);
 }
 
 .container {
@@ -27,8 +23,8 @@ body {
 }
 
 .input-container {
-  background-color: var(--card-dark);
-  border: 1px solid var(--border-dark);
+  background-color: var(--card-light);
+  border: 1px solid var(--border-light);
   border-radius: 0.5rem;
   padding: 0.75rem;
   transition: all 0.2s ease;
@@ -36,12 +32,12 @@ body {
 
 .input-container:focus-within {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 0 2px rgba(221, 190, 169, 0.2);
 }
 
 input {
   background-color: transparent;
-  color: var(--text-light);
+  color: var(--text-dark);
   border: none;
   outline: none;
   width: 100%;
@@ -68,15 +64,15 @@ button:disabled {
 }
 
 .card {
-  background-color: var(--card-dark);
-  border: 1px solid var(--border-dark);
+  background-color: var(--card-light);
+  border: 1px solid var(--border-light);
   border-radius: 0.5rem;
   padding: 1.5rem;
   margin: 1rem 0;
 }
 
 .loading-message {
-  color: var(--text-light);
+  color: var(--text-dark);
   font-size: 0.875rem;
   margin-top: 0.5rem;
   display: flex;
@@ -87,7 +83,7 @@ button:disabled {
 .loading-spinner {
   width: 1rem;
   height: 1rem;
-  border: 2px solid var(--text-light);
+  border: 2px solid var(--text-dark);
   border-top-color: transparent;
   border-radius: 50%;
   animation: spin 1s linear infinite;
