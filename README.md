@@ -6,7 +6,7 @@ Built with Next.js and cutting-edge AI technology, this open-source template ena
 
 ## Live Demo
 
-[https://social-media-post-generator-black.vercel.app/](https://social-media-post-generator-black.vercel.app/)
+[https://competitor-analyst.vercel.app/](https://competitor-analyst.vercel.app/)
 
 ## Features
 
